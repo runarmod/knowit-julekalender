@@ -8,28 +8,17 @@ d = {
 
 minimum_sleiphet = 18
 
-
-def knivstikk():
-    return (
-        sum(sorted([next(d[6]), next(d[6])])[-1:]) + 2 + next(d[4])
+angrep = itertools.cycle(
+    (
+        lambda: max([next(d[6]), next(d[6])]) + 2 + next(d[4])
         if next(d[20]) + 8 >= minimum_sleiphet
-        else 0
-    )
-
-
-def sverdslag():
-    return next(d[8]) + 5 if next(d[20]) + 6 >= minimum_sleiphet else 0
-
-
-def okseslag():
-    return (
-        min([next(d[10]), next(d[10])]) + 6
+        else 0,
+        lambda: next(d[8]) + 5 if next(d[20]) + 6 >= minimum_sleiphet else 0,
+        lambda: min([next(d[10]), next(d[10])]) + 6
         if next(d[20]) + 3 >= minimum_sleiphet
-        else 0
+        else 0,
     )
-
-
-angrep = itertools.cycle((knivstikk, sverdslag, okseslag))
+)
 
 i = 0
 helse = 10_000_000
