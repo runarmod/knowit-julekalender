@@ -1,8 +1,7 @@
-import sys
+from itertools import cycle
 
-sys.setrecursionlimit(10**6)
 
-m = {
+mapping = {
     "nittiseks": 96,
     "nitti": 90,
     "åttifire": 84,
@@ -21,21 +20,14 @@ m = {
     "seks": 6,
 }
 
-file = open("tall.txt", "r", encoding="utf-8").read().strip()
-for key in m:
-    assert key in file, key
+streng = open("tall.txt", "r", encoding="utf-8").read().strip()
 
-
-def dfs(i, s):
-    if i >= len(file):
-        return s
-
-    for key, val in m.items():
-        if file[i : i + len(key)] != key:
-            continue
-        d = dfs(i + len(key), s + val)
-        if d is not None:
-            return d
-
-
-print(dfs(0, 0) // 6)
+i = len(streng)
+s = 0
+for tall_str, tall in cycle(mapping.items()):
+    if streng.endswith(tall_str, 0, i):
+        s += tall
+        i -= len(tall_str)
+        if i <= 0:
+            break
+print(s // 6)
