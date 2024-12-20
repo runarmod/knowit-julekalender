@@ -1,0 +1,15 @@
+Legolas 75
+Tauriel 84
+Elrond 45
+Galadriel 59
+Thranduil 69
+Arwen 99
+Haldir 76
+Glorfindel 46
+Finrod 204
+Erestor 60
+Celebrimbor 99
+Fingolfin 66
+Gil-Galad 97
+Luthien 116
+Feanor 129
