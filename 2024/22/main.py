@@ -1,20 +1,7 @@
+import heapq
 from collections import deque
-from copy import deepcopy
 
 from tqdm import tqdm
-
-
-def custom_cache(func):
-    cache = {}
-
-    def wrapper(board):
-        tuple_board = tuple("".join(row) for row in board)
-        if tuple_board not in cache:
-            cache[tuple_board] = func(board)
-        return cache[tuple_board]
-
-    return wrapper
-
 
 with open("stekebrett.txt", encoding="utf-8") as f:
     data = [
@@ -79,7 +66,7 @@ def get_group(board: list[list[str]], x: int, y: int):
 
 def remove_group(board: list[list[str]], group: set[tuple[int, int]]):
     # Remove group
-    new_board = deepcopy(board)
+    new_board = list(map(list, board))
     for x, y in group:
         new_board[y][x] = " "
 
@@ -95,32 +82,41 @@ def remove_group(board: list[list[str]], group: set[tuple[int, int]]):
     return new_board
 
 
-def non_empty_coords(board: list[list[str]]):
-    for y, row in enumerate(board):
-        for x, cell in enumerate(row):
-            if cell != " ":
-                yield x, y
+def heuristic(grid: list[list[str]]):
+    return sum(1 for row in grid for c in row if c != " ") / 4
 
 
-@custom_cache
-def remaining_moves(board: list[list[str]]) -> int:
-    if next(non_empty_coords(board), None) is None:  # Empty board
-        return 0
+def Astar(grid: list[list[str]]):
+    q = []
+    heapq.heappush(q, (0, 0, grid))  # (steps + heuristic, steps, state)
+    visited = set()
 
-    optimal_group = get_optimal_group(board)
-    if optimal_group is not None:
-        return 1 + remaining_moves(remove_group(board, optimal_group))
+    while q:
+        _, steps, state = heapq.heappop(q)
+        if all(all(c == " " for c in row) for row in state):
+            return steps
+        t_state = tuple(map(tuple, state))
+        if t_state in visited:
+            continue
+        visited.add(t_state)
+        optimal_group = get_optimal_group(state)
+        if optimal_group is not None:
+            new_state = remove_group(state, optimal_group)
+            heapq.heappush(q, (steps + 1 + heuristic(new_state), steps + 1, new_state))
+            continue
 
-    removed = set()
-    best = float("inf")
-    for y, row in enumerate(board):
-        for x, cell in enumerate(row):
-            if (x, y) in removed or cell == " ":
-                continue
-            group = get_group(board, x, y)
-            removed.update(group)
-            best = min(best, 1 + remaining_moves(remove_group(board, group)))
-    return best
+        removed = set()
+        for y in range(len(state)):
+            for x in range(len(state[0])):
+                if state[y][x] == " " or (x, y) in removed:
+                    continue
+                group = get_group(state, x, y)
+                removed.update(group)
+                new_state = remove_group(state, group)
+                heapq.heappush(
+                    q, (steps + 1 + heuristic(new_state), steps + 1, new_state)
+                )
+    assert False, "No solution found"
 
 
-print(sum(remaining_moves(board) for board in tqdm(data)))
+print(sum(map(Astar, tqdm(data, leave=False))))
