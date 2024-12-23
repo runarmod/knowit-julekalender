@@ -1,12 +1,5 @@
 import matplotlib.pyplot as plt
 
-
-plt.scatter(
-    *zip(
-        *[
-            list(map(float, line.split(" ")))
-            for line in open("lekescan.txt").read().splitlines()
-        ]
-    )
-)
-plt.show()
+plt.scatter(*zip(*map(lambda s: map(float, s.split()), open("lekescan.txt").readlines())))
+plt.savefig("solution.png")
+print("SYKKEL")
